@@ -86,6 +86,8 @@ def main():
     model.eval()
 
     checkpointer = DetectronCheckpointer(cfg, model, save_dir=output_dir)
+
+    print(cfg.MODEL.WEIGHT)
     checkpointer.load(cfg.MODEL.WEIGHT)
 
     # dataset labelmap is used to convert the prediction to class labels
@@ -145,6 +147,7 @@ def main():
     else:
         labels = [d["class"] for d in dets]
 
+    # TODO: dont plot ALL bb and relations!!
     draw_bb(cv2_img, rects, labels, scores)
 
     if cfg.MODEL.RELATION_ON and args.visualize_relation:
@@ -160,6 +163,12 @@ def main():
         save_file = args.save_file
     cv2.imwrite(save_file, cv2_img)
     print("save results to: {}".format(save_file))
+
+    # Saving as JSON file as well
+    with open(save_file[:-4] + '_rels.json', 'w') as f:
+        json.dump(rel_dets, f)
+    with open(save_file[:-4] + '_objs.json', 'w') as f:
+        json.dump(dets, f)
 
     # save results in text
     if cfg.MODEL.ATTRIBUTE_ON and args.visualize_attr:

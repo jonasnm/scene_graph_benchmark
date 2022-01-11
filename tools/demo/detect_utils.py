@@ -6,6 +6,7 @@ from PIL import Image
 from scene_graph_benchmark.scene_parser import SceneParser
 from scene_graph_benchmark.AttrRCNN import AttrRCNN
 
+CONFIDENCE = 0.01
 
 def cv2Img_to_Image(input_img):
     cv2_img = input_img.copy()
@@ -47,8 +48,8 @@ def detect_objects_on_single_image(model, transforms, cv2_img):
             attr_labels = prediction.get_field("attr_labels")
             rt_box_list = [
                 {"rect": box, "class": cls, "conf": score,
-                "attr": attr[attr_conf > 0.01].tolist(),
-                "attr_conf": attr_conf[attr_conf > 0.01].tolist()}
+                "attr": attr[attr_conf > CONFIDENCE].tolist(),
+                "attr_conf": attr_conf[attr_conf > CONFIDENCE].tolist()}
                 for box, cls, score, attr, attr_conf in
                 zip(boxes, classes, scores, attr_labels, attr_scores)
             ]
@@ -68,8 +69,8 @@ def detect_objects_on_single_image(model, transforms, cv2_img):
             attr_labels = prediction.get_field("attr_labels")
             return [
                 {"rect": box, "class": cls, "conf": score,
-                "attr": attr[attr_conf > 0.01].tolist(),
-                "attr_conf": attr_conf[attr_conf > 0.01].tolist()}
+                "attr": attr[attr_conf > CONFIDENCE].tolist(),
+                "attr_conf": attr_conf[attr_conf > CONFIDENCE].tolist()}
                 for box, cls, score, attr, attr_conf in
                 zip(boxes, classes, scores, attr_labels, attr_scores)
             ]
